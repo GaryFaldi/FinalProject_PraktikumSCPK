@@ -9,8 +9,6 @@ st.title("Sistem Pendukung Keputusan: Deteksi Mahasiswa Paling Rawan Depresi (Me
 # Load dataset
 data = pd.read_csv("CleanedDataset.csv")
 
-
-
 # Rename kolom agar mudah
 data = data.rename(columns={
     "Academic Pressure": "academic_pressure",
@@ -67,7 +65,6 @@ data_sample.index = alternatives
 st.header("20 Alternatif Mahasiswa yang Diambil Secara Acak")
 st.dataframe(data_sample)
 
-# --- Hitung Vector S (manual loop mirip contoh rumah) ---
 st.header("Hitung Vector S")
 
 vector_s = []
@@ -92,7 +89,6 @@ s_df = pd.DataFrame(vector_s, index=alternatives, columns=["Vektor S"])
 st.write("Tabel Perhitungan Vektor S:")
 st.dataframe(s_df)
 
-# --- Hitung Vector V (manual pembagian mirip contoh rumah) ---
 st.header("Hitung Vector V")
 
 total_s = sum(vector_s)
