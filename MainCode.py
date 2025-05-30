@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Title
-st.title("Sistem Pendukung Keputusan: Deteksi Mahasiswa Paling Rawan Depresi (Metode WP)")
+st.title("Decision Support System: Detecting College Students Most Prone to Depression (WP Method)")
 
 # Load dataset
 data = pd.read_csv("CleanedDataset.csv")
@@ -20,6 +20,17 @@ data = data.rename(columns={
     "Financial Stress": "financial_stress"
 })
 
+display_columns = {
+    "academic_pressure": "Academic Pressure",
+    "cgpa": "CGPA/IPK",
+    "study_satisfaction": "Study Satisfaction",
+    "sleep_duration": "Sleep Duration",
+    "study_hours": "Study Hours",
+    "financial_stress": "Financial Stress",
+    "suicidal_thoughts": "Suicidal Thoughts"
+}
+
+
 # Mapping categorical data
 data["suicidal_thoughts"] = data["suicidal_thoughts"].map({"Yes": 1, "No": 0})
 data["sleep_duration"] = data["sleep_duration"].astype(str).str.replace("'", "").str.strip()
@@ -32,14 +43,13 @@ data["sleep_duration"] = data["sleep_duration"].map({
     "More than 8 hours": 9
 })
 
-# Kriteria dan bobot (exclude suicidal_thoughts karena sudah langsung dianggap depresi)
 criteria = {
-    "academic_pressure": {"type": "cost", "weight": 0.25},
-    "cgpa": {"type": "benefit", "weight": 0.15},
-    "study_satisfaction": {"type": "benefit", "weight": 0.15},
-    "sleep_duration": {"type": "benefit", "weight": 0.2},
-    "study_hours": {"type": "cost", "weight": 0.15},
-    "financial_stress": {"type": "cost", "weight": 0.10}
+    "academic_pressure": {"type": "benefit", "weight": 0.25},
+    "cgpa": {"type": "cost", "weight": 0.15},
+    "study_satisfaction": {"type": "cost", "weight": 0.15},
+    "sleep_duration": {"type": "cost", "weight": 0.2},
+    "study_hours": {"type": "benefit", "weight": 0.15},
+    "financial_stress": {"type": "benefit", "weight": 0.10}
 }
 
 # Konversi kolom kriteria ke float
@@ -62,10 +72,11 @@ alternatives = [f"A{i+1}" for i in range(len(data_sample))]
 data_sample.index = alternatives
 
 # Tampilkan data
-st.header("20 Alternatif Mahasiswa yang Diambil Secara Acak")
-st.dataframe(data_sample)
+st.header("20 Random Student Alternative Data")
+st.dataframe(data_sample.rename(columns=display_columns))
 
-st.header("Hitung Vector S")
+
+st.header("Calculate Vector S")
 
 vector_s = []
 for idx, row in data_sample.iterrows():
@@ -85,35 +96,35 @@ for idx, row in data_sample.iterrows():
     vector_s.append(s_val)
 
 
-s_df = pd.DataFrame(vector_s, index=alternatives, columns=["Vektor S"])
-st.write("Tabel Perhitungan Vektor S:")
+s_df = pd.DataFrame(vector_s, index=alternatives, columns=["Vector S"])
+st.write("S Vector Calculation Table:")
 st.dataframe(s_df)
 
-st.header("Hitung Vector V")
+st.header("Calculate Vector V")
 
 total_s = sum(vector_s)
 vector_v = [s / total_s for s in vector_s]
 
-v_df = pd.DataFrame(vector_v, index=alternatives, columns=["Vektor V"])
-st.write("Tabel Perhitungan Vektor V:")
+v_df = pd.DataFrame(vector_v, index=alternatives, columns=["Vector V"])
+st.write("V Vector Calculation Table:")
 st.dataframe(v_df)
 
 # Gabungkan hasil
 result_df = data_sample.copy()
-result_df["Vektor S"] = vector_s
-result_df["Vektor V"] = vector_v
+result_df["Vector S"] = vector_s
+result_df["Vector V"] = vector_v
 
 # Urutkan hasil
-result_df = result_df.sort_values(by="Vektor V", ascending=False)
+result_df = result_df.sort_values(by="Vector V", ascending=False)
 
-st.header("Ranking Mahasiswa Berdasarkan WP")
-st.dataframe(result_df)
+st.header("College Student Ranking Based on WP")
+st.dataframe(result_df.rename(columns=display_columns))
 
 # Visualisasi
-st.header("Visualisasi Ranking Mahasiswa")
+st.header("Student Ranking Visualization")
 fig, ax = plt.subplots(figsize=(10, 6))
-ax.barh(result_df.index, result_df["Vektor V"], color="tomato")
+ax.barh(result_df.index, result_df["Vector V"], color="skyblue")
 ax.invert_yaxis()
-ax.set_xlabel("Vektor V")
-ax.set_title("Ranking Mahasiswa Paling Rawan Depresi")
+ax.set_xlabel("Vector V")
+ax.set_title("Ranking of Students Most Prone to Depression")
 st.pyplot(fig)
