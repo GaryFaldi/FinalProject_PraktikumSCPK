@@ -80,18 +80,18 @@ display_columns = {
     "suicidal_thoughts": "Suicidal Thoughts"
 }
 
-# Format tampilan angka di UI
-format_dict = {
-    "academic_pressure": "{:.0f}",
-    "cgpa": "{:.0f}",
-    "study_satisfaction": "{:.0f}",
-    "sleep_duration": "{:.0f}",
-    "suicidal_thoughts": "{:.0f}",
-    "study_hours": "{:.0f}",
-    "financial_stress": "{:.0f}",
-    "Age": "{:.0f}",
-    "ID": "{:.0f}"
-}
+# # Format tampilan angka di UI
+# format_dict = {
+#     "academic_pressure": "{:.0f}",
+#     "cgpa": "{:.0f}",
+#     "study_satisfaction": "{:.0f}",
+#     "sleep_duration": "{:.0f}",
+#     "suicidal_thoughts": "{:.0f}",
+#     "study_hours": "{:.0f}",
+#     "financial_stress": "{:.0f}",
+#     "Age": "{:.0f}",
+#     "ID": "{:.0f}"
+# }
 
 # ======= FUNGSI HITUNG VECTOR S METODE WP =======
 @st.cache_data
@@ -118,11 +118,11 @@ if menu == "📘 Deskripsi":
     .big-title {
         font-size: 36px;
         font-weight: bold;
-        color: #2C3E50;
+        color: #fffff;
     }
     .sub-text {
         font-size: 18px;
-        color: #34495E;
+        color: #fffff;
     }
     </style>
     <div class='big-title'>🧠 Sistem Pendukung Keputusan Mahasiswa Paling Rawan Depresi</div>
@@ -152,43 +152,15 @@ elif menu == "📊 Data Alternatif":
     # Rename kolom untuk tampil di UI
     df_renamed = data.rename(columns=display_columns)
 
-    # Format angka sesuai tampilan
-    format_dict_after_rename = {
-        "Academic Pressure": "{:.0f}",
-        "CGPA/IPK": "{:.0f}",
-        "Study Satisfaction": "{:.0f}",
-        "Sleep Duration": "{:.0f}",
-        "Suicidal Thoughts": "{:.0f}",
-        "Study Hours": "{:.0f}",
-        "Financial Stress": "{:.0f}",
-        "Age": "{:.0f}",
-        "ID": "{:.0f}"
-    }
-
-    # Styling tabel agar lebih menarik
-    styled_data = df_renamed.style.format(format_dict_after_rename).set_table_styles([
-        {
-            'selector': 'thead th',
-            'props': [('background-color', '#3498DB'), ('color', 'white')]
-        },
-        {
-            'selector': 'tbody tr:nth-child(even)',
-            'props': [('background-color', '#f2f2f2')]
-        }
-    ])
-
     # Tampilkan dataframe di Streamlit
-    st.dataframe(styled_data)
+    st.dataframe(df_renamed)
 
 
 elif menu == "🧮 Perhitungan Vector S":
     # Tampilkan hasil perhitungan Vector S
     st.subheader("🧮 Perhitungan Nilai Vektor S")
     s_df = pd.DataFrame(vector_s, index=alternatives, columns=["Vector S"])
-    st.dataframe(s_df.style.format("{:.6f}").set_table_styles([
-        {'selector': 'thead th', 'props': [('background-color', '#1ABC9C'), ('color', 'white')]},
-        {'selector': 'tbody tr:nth-child(even)', 'props': [('background-color', '#eafaf1')]}
-    ]))
+    st.dataframe(s_df.style.format("{:.6f}"))
 
 elif menu == "📈 Perhitungan Vector V & Ranking":
     # Hitung Vector V dari Vector S dan tampilkan ranking tertinggi
@@ -210,15 +182,7 @@ elif menu == "📈 Perhitungan Vector V & Ranking":
     format_dict = {col: "{:.6f}" if "Vector" in col else "{:.0f}" for col in numeric_cols}
 
     # Tampilkan dataframe hasil ranking
-    st.dataframe(
-        styled_result.style
-            .format(format_dict)
-            .set_table_styles([
-                {'selector': 'thead th', 'props': [('background-color', '#9B59B6'), ('color', 'white')]},
-                {'selector': 'tbody tr:nth-child(even)', 'props': [('background-color', '#f8f0fb')]}
-            ])
-    )
-
+    st.dataframe(styled_result.style.format(format_dict))
 
 elif menu == "🌟 Visualisasi":
     # Visualisasi bar chart ranking mahasiswa rawan depresi
