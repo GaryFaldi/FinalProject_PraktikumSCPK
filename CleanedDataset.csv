@@ -1,4 +1,4 @@
-id,Gender,Age,Academic Pressure,CGPA,Study Satisfaction,Sleep Duration,Have you ever had suicidal thoughts ?,Work/Study Hours,Financial Stress
+ID,Gender,Age,Academic Pressure,CGPA,Study Satisfaction,Sleep Duration,Have you ever had suicidal thoughts ?,Work/Study Hours,Financial Stress
 2,Male,33.0,5.0,8.97,2.0,'5-6 hours',Yes,3.0,1.0
 8,Female,24.0,2.0,5.9,5.0,'5-6 hours',No,3.0,2.0
 26,Male,31.0,3.0,7.03,5.0,'Less than 5 hours',No,9.0,1.0
@@ -11488,7 +11488,7 @@ id,Gender,Age,Academic Pressure,CGPA,Study Satisfaction,Sleep Duration,Have you 
 58056,Male,20.0,2.0,5.27,3.0,'5-6 hours',Yes,11.0,5.0
 58058,Male,22.0,1.0,7.88,5.0,'5-6 hours',No,2.0,4.0
 58061,Male,31.0,2.0,9.36,4.0,'7-8 hours',Yes,10.0,5.0
-58062,Female,32.0,5.0,0.0,0.0,'Less than 5 hours',Yes,11.0,5.0
+58062,Female,32.0,2.0,7.65,3.0,'Less than 5 hours',Yes,9.0,4.0
 58064,Female,33.0,5.0,6.38,2.0,'Less than 5 hours',Yes,4.0,5.0
 58067,Female,20.0,5.0,8.23,2.0,'Less than 5 hours',Yes,10.0,3.0
 58071,Male,24.0,1.0,9.97,2.0,'7-8 hours',No,11.0,4.0

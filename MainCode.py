@@ -9,7 +9,8 @@ st.set_page_config(page_title="Deteksi Mahasiswa Rawan Depresi", layout="wide", 
 # ======= NAVIGASI SIDEBAR =======
 menu = st.sidebar.radio("Navigasi", [
     "📘 Deskripsi", 
-    "📊 Data Alternatif", 
+    "📝 Masukkan Bobot",
+    "📊 Data Alternatif",
     "🧮 Perhitungan Vector S", 
     "📈 Perhitungan Vector V & Ranking", 
     "🌟 Visualisasi"
@@ -45,20 +46,35 @@ data["sleep_duration"] = data["sleep_duration"].map({
 })
 
 # ======= DEKLARASI KRITERIA DAN BOBOT =======
-criteria = {
-    "academic_pressure": {"type": "cost", "weight": 0.2},
-    "cgpa": {"type": "benefit", "weight": 0.15},
-    "study_satisfaction": {"type": "benefit", "weight": 0.15},
-    "sleep_duration": {"type": "benefit", "weight": 0.2},
-    "study_hours": {"type": "cost", "weight": 0.15},
-    "financial_stress": {"type": "cost", "weight": 0.15}
-}
+if "criteria" not in st.session_state:
+    st.session_state.criteria = {
+        "academic_pressure": {"type": "benefit", "weight": 0.2},
+        "cgpa": {"type": "cost", "weight": 0.15},
+        "study_satisfaction": {"type": "cost", "weight": 0.15},
+        "sleep_duration": {"type": "cost", "weight": 0.2},
+        "study_hours": {"type": "benefit", "weight": 0.15},
+        "financial_stress": {"type": "benefit", "weight": 0.15}
+    }
+criteria = st.session_state.criteria
 
 # Ubah semua kolom kriteria menjadi numerik dan hilangkan baris dengan nilai kosong
 for col in criteria.keys():
     data[col] = pd.to_numeric(data[col], errors='coerce')
 
 data = data.dropna(subset=criteria.keys())
+
+# Simpan salinan data asli untuk tampilan UI
+original_data = data.copy()
+
+# ======= OPSI NORMALISASI =======
+use_normalization = st.sidebar.checkbox("Gunakan normalisasi data", value=True)
+
+if use_normalization:
+    for k in criteria.keys():
+        col = data[k]
+        # Normalisasi Min-Max + epsilon agar tidak nol
+        data[k] = 1 + 9 * ((col - col.min()) / (col.max() - col.min()))  # hasil normalisasi antara 1 hingga 10
+
 
 # Normalisasi bobot agar total bobot = 1
 total_weight = sum(c["weight"] for c in criteria.values())
@@ -94,7 +110,6 @@ display_columns = {
 # }
 
 # ======= FUNGSI HITUNG VECTOR S METODE WP =======
-@st.cache_data
 def hitung_vector_s(data, criteria):
     vector_s = []
     for idx, row in data.iterrows():
@@ -136,13 +151,41 @@ if menu == "📘 Deskripsi":
     with st.expander("ℹ️ Penjelasan Kriteria"):
         st.markdown("""
         **Kriteria Penilaian WP:**
-        - 🎓 **Academic Pressure** *(semakin tinggi tekanan, semakin rawan → cost)*
-        - 🧮 **CGPA/IPK** *(semakin tinggi, semakin baik → benefit)*
-        - 🙂 **Study Satisfaction** *(semakin puas, semakin baik → benefit)*
-        - 🛌 **Sleep Duration** *(semakin cukup tidur, semakin baik → benefit)*
-        - 📚 **Study Hours** *(semakin tinggi jam belajar bisa meningkatkan tekanan → cost)*
-        - 💰 **Financial Stress** *(semakin besar tekanan finansial, semakin rawan → cost)*
+        - 🎓 **Academic Pressure** *(semakin tinggi tekanan, semakin rawan → benefit)*
+        - 🧮 **CGPA/IPK** *(semakin tinggi, semakin baik → cost)*
+        - 🙂 **Study Satisfaction** *(semakin puas, semakin baik → cost)*
+        - 🛌 **Sleep Duration** *(semakin cukup tidur, semakin baik → cost)*
+        - 📚 **Study Hours** *(semakin tinggi jam belajar bisa meningkatkan tekanan → benefit)*
+        - 💰 **Financial Stress** *(semakin besar tekanan finansial, semakin rawan → benefit)*
         """)
+
+elif menu == "📝 Masukkan Bobot":
+    st.subheader("📝 Masukkan Bobot Kriteria")
+
+    with st.form("form_bobot"):
+        st.markdown("Masukkan bobot untuk masing-masing kriteria (total 100):")
+
+        input_weights = {}
+        for key, info in criteria.items():
+            display_name = display_columns[key]
+            default_val = int(info["weight"] * 100)
+            input_weights[key] = st.number_input(f"{display_name} (%)", min_value=0, max_value=100, value=default_val, step=1)
+
+        submitted = st.form_submit_button("Simpan Bobot")
+
+    if submitted:
+        total_input = sum(input_weights.values())
+
+        if total_input == 0:
+            st.error("Total bobot tidak boleh 0.")
+        elif any(val < 1 for val in input_weights.values()):
+            st.error("Setiap bobot minimal harus 1%.")  
+        elif total_input != 100:
+            st.warning(f"Total bobot saat ini: {total_input}. Harus berjumlah 100.")
+        else:
+            for k in criteria:
+                criteria[k]["weight"] = input_weights[k] / 100  # Normalisasi bobot
+            st.success("Bobot berhasil diperbarui!")
 
 elif menu == "📊 Data Alternatif":
     # Tampilkan data alternatif mahasiswa
@@ -150,7 +193,7 @@ elif menu == "📊 Data Alternatif":
     pd.set_option("styler.render.max_elements", 300000)
 
     # Rename kolom untuk tampil di UI
-    df_renamed = data.rename(columns=display_columns)
+    df_renamed = original_data.rename(columns=display_columns)
 
     # Tampilkan dataframe di Streamlit
     st.dataframe(df_renamed)
@@ -159,16 +202,18 @@ elif menu == "📊 Data Alternatif":
 elif menu == "🧮 Perhitungan Vector S":
     # Tampilkan hasil perhitungan Vector S
     st.subheader("🧮 Perhitungan Nilai Vektor S")
+    vector_s = hitung_vector_s(data, criteria)
     s_df = pd.DataFrame(vector_s, index=alternatives, columns=["Vector S"])
     st.dataframe(s_df.style.format("{:.6f}"))
 
 elif menu == "📈 Perhitungan Vector V & Ranking":
     # Hitung Vector V dari Vector S dan tampilkan ranking tertinggi
     st.subheader("📈 Perhitungan Nilai Vektor V dan Ranking")
-
+    vector_s = hitung_vector_s(data, criteria)
     total_s = sum(vector_s)
     vector_v = [s / total_s for s in vector_s]
     v_df = pd.DataFrame(vector_v, index=alternatives, columns=["Vector V"])
+    st.dataframe(v_df)
 
     # Gabungkan hasil ke dataframe asli dan urutkan berdasarkan Vector V
     result_df = data.copy()
@@ -188,6 +233,7 @@ elif menu == "🌟 Visualisasi":
     # Visualisasi bar chart ranking mahasiswa rawan depresi
     st.subheader("🌟 Visualisasi Ranking Mahasiswa")
     result_df = data.copy()
+    vector_s = hitung_vector_s(data, criteria)
     result_df["Vector S"] = vector_s
     result_df["Vector V"] = [s / sum(vector_s) for s in vector_s]
     result_df = result_df.sort_values(by="Vector V", ascending=False).head(20)

@@ -11488,7 +11488,6 @@ id,Gender,Age,City,Profession,Academic Pressure,Work Pressure,CGPA,Study Satisfa
 58056,Male,20.0,Ludhiana,Student,2.0,0.0,5.27,3.0,0.0,'5-6 hours',Unhealthy,'Class 12',Yes,11.0,5.0,Yes,1
 58058,Male,22.0,Jaipur,Student,1.0,0.0,7.88,5.0,0.0,'5-6 hours',Healthy,MSc,No,2.0,4.0,No,0
 58061,Male,31.0,Patna,Student,2.0,0.0,9.36,4.0,0.0,'7-8 hours',Unhealthy,M.Ed,Yes,10.0,5.0,No,1
-58062,Female,32.0,Vadodara,Student,5.0,0.0,0.0,0.0,0.0,'Less than 5 hours',Unhealthy,'Class 12',Yes,11.0,5.0,No,1
 58064,Female,33.0,Faridabad,Student,5.0,0.0,6.38,2.0,0.0,'Less than 5 hours',Unhealthy,M.Ed,Yes,4.0,5.0,Yes,1
 58067,Female,20.0,Hyderabad,Student,5.0,0.0,8.23,2.0,0.0,'Less than 5 hours',Healthy,'Class 12',Yes,10.0,3.0,No,1
 58071,Male,24.0,Ludhiana,Student,1.0,0.0,9.97,2.0,0.0,'7-8 hours',Moderate,'Class 12',No,11.0,4.0,No,0
